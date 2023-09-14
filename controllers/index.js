@@ -115,6 +115,13 @@ exports.bid = async (req, res, next) => {
     if (good.Auctions[0]?.bid >= bid) {
       return res.status(403).send("이전 입찰가보다 높아야 합니다");
     }
+    const currentUser = await User.findByPk(req.user.id);
+    const userMoney = currentUser.money;
+    if (userMoney < bid) {
+      return res
+        .status(404)
+        .send("보유한 돈보다 많은 금액으로 입찰할 수 없습니다.");
+    }
     const result = await Auction.create({
       bid,
       msg,
